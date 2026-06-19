@@ -1,0 +1,132 @@
+Money	
+	affordable	
+	mid range
+	high end
+Time	Store/Filters/Filter by Style dropdown label
+	traditional	Store/Filters/Style/Traditional option
+	retro	Store/Filters/Style/Retro option
+	contemporary	Store/Filters/Style/Contemporary option
+	futuristic	Store/Filters/Style/Futuristic option
+Details	Store/Filters/Filter by Details dropdown label
+	simple	Store/Filters/Details/Minimalistic option
+	some details	Store/Filters/Details/Ordinary option
+	detailed	Store/Filters/Details/Ornate option
+Cozyness	Store/Filters/Filter by Mood dropdown label
+	austere	Store/Filters/Mood/Severe option
+	cozy	Store/Filters/Mood/Cozy option
+	semi-cozy	Store/Filters/Mood/Neutral option
+Plant
+Dev
+Flask
+Addons
+	Shelfcart
+Tools
+ItemGroup
+	Dev
+	Musical instruments
+	Window
+	Potted plant
+	Bath or Showering
+	Bonus Kitchen Equipment
+	Cooking Appliance of any kind
+	Fridge or Food Cooler
+	Sink of any kind
+	Sleeping - 1 Double
+	Sleeping - 1 Single
+	Sleeping - 2 Singles
+	Toilet of any kind
+	Temperature Comforts
+Socketable
+	Clothes
+	OvenTowel
+	KitchenClutter
+	ShelfCart
+	Shaker
+	Keys
+	ToiletPaper
+	Toast A
+	Flower Single A
+	ScrewBoxLarge
+	ScrewBoxSmall
+	GolfClub
+	ExerciseBench
+	Broomba
+	Earbud
+	BeehiveSeparator
+	BeehiveRoof
+	BeehiveSegment
+	Umbrella
+	Iron
+	TowelForRack
+	TowelForHook
+	Shop Rack 1
+	RingToy
+	Portafilter
+	WitchHat
+	Shaver
+	ShavingBrush
+	Duck
+	HalloweenBroom
+	NormalBroom
+	Screwdriver Holder 1
+	Christmas Toys
+	Christmas Tree 1
+	Ornaments
+	OrnamentsLarge
+	Spice Container 1
+	Pool Ball 1
+	Fire Extinguisher
+	First Aid Kit
+	PoolBall 1
+	Tealight 1
+	Toothbrush 1
+	Toothpaste 1
+	Retro Medium Camera
+	Chess Pawn 1
+	Postit Stack
+	Marker Crayon
+	Small Pen
+	Big Pen
+	CD Disk
+	Vinyl Cover
+	Old Oar
+	Bowling Ball
+	Diamond
+	Ride Cup
+	Ride Plate
+	Fireplace Tools Modern 1
+	Fireplace Tool Classic
+	Fence Gate
+	Ski
+	Snowboard
+	Santa Glasses 1
+	Santa Jacket 1
+	Weight Plate
+	Weight Plate Curl Bar
+	Ski Boot
+	Christmas Tree Branch
+	Bessie Figurines 1
+	Bicycle
+	Chasen
+	Hat
+	Hangered Long Clothes
+	Hangered Clothes
+	Hangered Medium Clothes
+	Calligraphy Brush
+	Shoji Panel 0.8
+	Shoji Panel 1.0
+	Shoji Panel 1.2
+	Chopsticks
+	Tablet Stylus
+	Stackable Cup
+	Knife
+	Noodle Strainer
+	Small Spice Container
+	Medium Spice Container
+	School Chair
+	Microphone
+	Folding Fan
+SurfaceFinish
+Achievement
+	TeaCeremony
+	SmartToilet
