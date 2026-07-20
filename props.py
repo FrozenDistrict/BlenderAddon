@@ -1,18 +1,6 @@
 from math import radians
-from .hf_data import Enums
+
 import bpy
-from .hf_data.HelpData import help_element 
-
-
-def HF2_Mtz_props():
-    return bpy.context.scene.hf2Mtz
-
-def HF2_Mtz_list():
-    return HF2_Mtz_props().hf2_materializers
-
-def HF2_Active_Mtz():
-    return HF2_Mtz_list()[HF2_Mtz_props().active_mtz_index]
-
 from bpy.props import (
         StringProperty,
         EnumProperty,
@@ -23,6 +11,19 @@ from bpy.props import (
         FloatVectorProperty,
         FloatProperty
         )
+
+from .hf_data import Enums
+from .hf_data.HelpData import HF2HelpElement
+
+
+def get_HF2_Mtz_props():
+    return bpy.context.scene.hf2Mtz
+
+def get_HF2_Mtz_list():
+    return get_HF2_Mtz_props().hf2_materializers
+
+def get_HF2_Active_Mtz():
+    return get_HF2_Mtz_list()[get_HF2_Mtz_props().active_mtz_index]
 
 
 class HF2_Selectable_Element(bpy.types.PropertyGroup):
@@ -38,54 +39,56 @@ class HF2_List(bpy.types.PropertyGroup):
 
 
 class HF2_Article_Data(bpy.types.PropertyGroup):
-    price : IntProperty(default = 0, min = 0, description = help_element(25))
+    price : IntProperty(default = 0, min = 0, description = HF2HelpElement.ArticlePrice.value)
     shop_category : StringProperty(default = "")
 
     item_kind : StringProperty(default = "")
     item_kind_is_custom : BoolProperty(default = False)
-    
+
     item_series : StringProperty(default = "")
     item_series_is_custom : BoolProperty(default = False)
 
     affordability : StringProperty(default = "")
-    
+
+    x_factor : IntProperty(default = 0, options = {'HIDDEN'})
+
 
 
 class HF2_Materializer(bpy.types.PropertyGroup):
-    name : StringProperty(default = "Name", description = help_element(19))
-    type : EnumProperty(items = Enums.mtz_type, description = help_element(18))
-    custom_colors : IntProperty(default = 0, soft_min = 0, soft_max = 4, description = help_element(2))
-    avaliability : EnumProperty(items = Enums.avaliability, description = help_element(6))
+    name : StringProperty(default = "Name", description = HF2HelpElement.MaterializerName.value)
+    type : EnumProperty(items = Enums.mtz_type, description = HF2HelpElement.MaterializerType.value)
+    custom_colors : IntProperty(default = 0, soft_min = 0, soft_max = 4, description = HF2HelpElement.CustomColors.value)
+    avaliability : EnumProperty(items = Enums.avaliability, description = HF2HelpElement.Avaliability.value)
     category :  IntProperty(default = 0)
-    
-    mod_path : StringProperty(name = "Mod Path", default = "", description = help_element(20), maxlen=2000,
+
+    mod_path : StringProperty(name = "Mod Path", default = "", description = HF2HelpElement.ModPath.value, maxlen=2000,
         subtype='DIR_PATH')
 
     materializer_stid : StringProperty()
     materializer_category : StringProperty()
     active_mtz_stid_index : IntProperty(default = 0)
 
-    
+
     uv_unit_sizes : CollectionProperty(type = HF2_List)
     active_uv_unit_sizes_index : IntProperty(default = 0)
-    
-    is_grimy : BoolProperty(default = False, description = help_element(5))
-    support_mosaic : BoolProperty(default = False, description = help_element(3))
-    support_pattern : BoolProperty(default = False, description = help_element(4))
+
+    is_grimy : BoolProperty(default = False, description = HF2HelpElement.IsGrimy.value)
+    support_mosaic : BoolProperty(default = False, description = HF2HelpElement.SupportMosaic.value)
+    support_pattern : BoolProperty(default = False, description = HF2HelpElement.SupportPattern.value)
 
 
     main_texture : PointerProperty(type = bpy.types.Image)
     normal_map_texture : PointerProperty(type = bpy.types.Image)
-    normal_map_format : EnumProperty(items = [('0', "OpenGL", ""), ('1', "DirectX", "")], default = '0', description = help_element(24))
+    normal_map_format : EnumProperty(items = [('0', "OpenGL", ""), ('1', "DirectX", "")], default = '0', description = HF2HelpElement.NormalMapFormat.value)
 
 
     maos_texture : PointerProperty(type = bpy.types.Image)
-    maos_texture_combined :  EnumProperty(items = [('0', "Combined", ""), ('1', "Split", "")], default = '0', description = help_element(22))
-    
+    maos_texture_combined :  EnumProperty(items = [('0', "Combined", ""), ('1', "Split", "")], default = '0', description = HF2HelpElement.MAOSTextureType.value)
+
 
     ao_texture : PointerProperty(type = bpy.types.Image)
     smoothness_texture : PointerProperty(type = bpy.types.Image)
-    is_smoothness : BoolProperty(default = True, description = help_element(23))
+    is_smoothness : BoolProperty(default = True, description = HF2HelpElement.UseSmoothnessInsteadOfRoughness.value)
     metallic_texture : PointerProperty(type = bpy.types.Image)
 
 
@@ -97,10 +100,10 @@ class HF2_Materializer(bpy.types.PropertyGroup):
 
     color_map_texture : PointerProperty(type = bpy.types.Image)
     mask_map_texture : PointerProperty(type = bpy.types.Image)
-    invert_mask_alpha : BoolProperty(default = False, description = help_element(9))
+    invert_mask_alpha : BoolProperty(default = False, description = HF2HelpElement.InvertAlpha.value)
 
-    allowed_rotations : EnumProperty(items = Enums.allowed_rotations, description = help_element(14))
-    pattern_usage : EnumProperty(items = Enums.pattern_usage, description = help_element(15))
+    allowed_rotations : EnumProperty(items = Enums.allowed_rotations, description = HF2HelpElement.AllowedRotations.value)
+    pattern_usage : EnumProperty(items = Enums.pattern_usage, description = HF2HelpElement.PatternUsage.value)
 
     collection_preview : PointerProperty(type = bpy.types.Collection)
     material_preview : PointerProperty(type = bpy.types.Material)
@@ -110,7 +113,7 @@ class HF2_Materializer(bpy.types.PropertyGroup):
 
 
     article_data : PointerProperty(type = HF2_Article_Data)
-    
+
 
 
 class CC_Addon_Props(bpy.types.PropertyGroup):
@@ -125,7 +128,7 @@ classes = (
     HF2_Materializer,
     HF2_Selectable_Element,
     CC_Addon_Props
-)	
+)
 
 
 
@@ -133,19 +136,10 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
 
-    s = bpy.types.Scene
-    m = bpy.types.Material
-    o = bpy.types.Object
+    bpy.types.Scene.hf2Mtz = PointerProperty(type=CC_Addon_Props)
 
-    s.hf2Mtz = PointerProperty(type=CC_Addon_Props)
-    
 def unregister():
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
 
-    s = bpy.types.Scene
-    m = bpy.types.Material
-    o = bpy.types.Object
-
-    del s.hf2Mtz
-    
+    del bpy.types.Scene.hf2Mtz

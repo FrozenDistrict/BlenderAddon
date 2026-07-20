@@ -2,60 +2,59 @@ import bpy
 import os
 import shutil
 
-from .props import HF2_Mtz_list, HF2_Active_Mtz, HF2_Mtz_props
+from .props import get_HF2_Mtz_list, get_HF2_Active_Mtz, get_HF2_Mtz_props
 from .materializer_loader import assign_materializer
-from .config import TextureSuffixes, Defaults
+from .consts import TextureSuffixes, Defaults
 from .data_exporter import export_data
 from .export_exceptions import *
-from .hf_data.HelpData import help_element
 from mathutils import Vector
 from .image_manipulation import set_alpha_to_0, combine_maos, invert_normal_map
 
 def set_mtz_category(category):
-    mtz = HF2_Active_Mtz()
+    mtz = get_HF2_Active_Mtz()
     mtz.materializer_category = category
 
 def set_mtz_item_kind(item_kind):
-    mtz = HF2_Active_Mtz()
+    mtz = get_HF2_Active_Mtz()
     mtz.article_data.item_kind = item_kind
     
 def set_mtz_item_series(item_series):
-    mtz = HF2_Active_Mtz()
+    mtz = get_HF2_Active_Mtz()
     mtz.article_data.item_series = item_series
 
 def set_mtz_affordability(affordability):
-    mtz = HF2_Active_Mtz()
+    mtz = get_HF2_Active_Mtz()
     mtz.article_data.affordability = affordability
 
 def set_mtz_shop_category(shop_category):
-    mtz = HF2_Active_Mtz()
+    mtz = get_HF2_Active_Mtz()
     mtz.article_data.shop_category = shop_category
 
 def create_mtz():
-    mtz = HF2_Mtz_list().add()
+    mtz = get_HF2_Mtz_list().add()
     return mtz
 
 def remove_mtz():
-    active_mtz_index = HF2_Mtz_props().active_mtz_index
-    HF2_Mtz_list().remove(active_mtz_index)
+    active_mtz_index = get_HF2_Mtz_props().active_mtz_index
+    get_HF2_Mtz_list().remove(active_mtz_index)
 
 
 def add_uv_unit_size():
-    uv_unit_size = HF2_Active_Mtz().uv_unit_sizes.add()
+    uv_unit_size = get_HF2_Active_Mtz().uv_unit_sizes.add()
     uv_unit_size.name = Defaults.UVUNITSIZE
 
     
 def remove_un_unit_size():
-    mtz = HF2_Active_Mtz()
+    mtz = get_HF2_Active_Mtz()
     active_uv_unit_size_index = mtz.active_uv_unit_sizes_index
     mtz.uv_unit_sizes.remove(active_uv_unit_size_index)
 
 def set_mtz_stid(mtz_stid):
-    mtz = HF2_Active_Mtz()
+    mtz = get_HF2_Active_Mtz()
     mtz.materializer_stid = mtz_stid
 
 def add_mtz_stid(mtz_stid):
-    mtz = HF2_Active_Mtz()
+    mtz = get_HF2_Active_Mtz()
     existing_stids = [x.name for x in mtz.materializer_stids]
     if mtz_stid not in existing_stids:
         stid = mtz.materializer_stids.add()
@@ -63,13 +62,13 @@ def add_mtz_stid(mtz_stid):
 
     
 def remove_mtz_stid():
-    mtz = HF2_Active_Mtz()
+    mtz = get_HF2_Active_Mtz()
     active_mtz_stid_index = mtz.active_mtz_stid_index
     mtz.materializer_stids.remove(active_mtz_stid_index)
 
 
 def create_icon_render_camera():
-    props = HF2_Mtz_props()
+    props = get_HF2_Mtz_props()
     camera = props.icon_render_camera
     if not camera:
         bpy.ops.object.camera_add()
@@ -192,7 +191,7 @@ def setup_composition():
 
 
 def setup_preview_main():
-    mtz = HF2_Active_Mtz()
+    mtz = get_HF2_Active_Mtz()
     create_icon_render_camera()
 
     if(not mtz.collection_preview):
@@ -237,9 +236,6 @@ def setup_material(mtz, is_icon, material = None):
         assign_materializer(mtz.material_icon_preview, mtz, is_icon)
         
 
-def get_help(hf2_help_element):
-    return help_element(hf2_help_element)
-
 def _export_textures(mtz, mtz_path):
     if int(mtz.type) == 0:
         _export_textures_standard(mtz, mtz_path)
@@ -280,8 +276,8 @@ def _export_textures_standard(mtz, mtz_path):
     
 
 def icon_can_be_rendered():
-    mtz = HF2_Active_Mtz()
-    return mtz.collection_preview and mtz.material_icon_preview and mtz.object_preview and mtz.sun_preview and HF2_Mtz_props().icon_render_camera
+    mtz = get_HF2_Active_Mtz()
+    return mtz.collection_preview and mtz.material_icon_preview and mtz.object_preview and mtz.sun_preview and get_HF2_Mtz_props().icon_render_camera
 
 def _export_textures_pattern(mtz, mtz_path):
     if(mtz.color_map_texture):
@@ -303,18 +299,18 @@ def _export_textures_pattern(mtz, mtz_path):
         _copy_texture(texture_path,mtz_path,mtz.name, TextureSuffixes.ICON)
     
 
-def _texture_path(f, to, mtz_name, type):
-    filename, file_extension = os.path.splitext(f)
+def _texture_path(source, target_directory, mtz_name, type):
+    filename, file_extension = os.path.splitext(source)
     filename = "%s tex %s%s" % (mtz_name, type, file_extension)
-    dst = os.path.join(to, filename)
+    dst = os.path.join(target_directory, filename)
     return dst
 
 
-def _copy_texture(f, to, mtz_name, type):
-    dst = _texture_path(f, to, mtz_name, type)
-    if(f==dst):
+def _copy_texture(source, target_directory, mtz_name, type):
+    dst = _texture_path(source, target_directory, mtz_name, type)
+    if(source == dst):
         return
-    shutil.copyfile(f, dst)
+    shutil.copyfile(source, dst)
 
 
 def _validate_uv_unit_sizes(uv_unit_sizes):
@@ -332,7 +328,7 @@ def _validate_mod_folder_path(mod_path):
         raise HF2ModFolderInvalid(mod_path)
 
 def _validate_mtz_number():
-    if(not len(HF2_Mtz_list())):
+    if(not len(get_HF2_Mtz_list())):
         raise NoMTZ("Materializer") 
     
 def _validate_stids(mtz):
@@ -368,11 +364,15 @@ def _validate_textures_po2(mtz):
         textures_to_check.append(mtz.ao_texture)
     
 
+    non_po2_textures = []
     for tex in textures_to_check:
         width = tex.size[0]
         height = tex.size[1]
         if not is_power_of_two(width) or not is_power_of_two(height):
-            raise NoPO2(tex.name)
+            non_po2_textures.append(tex.name)
+
+    if non_po2_textures:
+        raise NoPO2(", ".join(non_po2_textures))
 
 
 def _validate_pillow_pack(mtz):
@@ -394,7 +394,7 @@ def _get_mod_folder_path(hf2_mc_path, mtz):
 
     return os.path.join(hf2_mc_path,mod_subfolder,mtz.name)
 
-def _validate_if_splitted_textures_are_same_size(mtz):
+def _validate_if_split_textures_are_same_size(mtz):
     sizes = []
     if mtz.metallic_texture:
         sizes.append(mtz.metallic_texture.size)
@@ -407,13 +407,13 @@ def _validate_if_splitted_textures_are_same_size(mtz):
         return
     first_size = sizes[0]
     for size in sizes:
-        if size[0] != first_size[0] & size[1] != first_size[1]:
-            raise SplittedTexturesNotSameSize()
+        if size[0] != first_size[0] or size[1] != first_size[1]:
+            raise SplitTexturesNotSameSize()
 
 
 
 def render_icon_preview():
-    mtz = HF2_Active_Mtz()
+    mtz = get_HF2_Active_Mtz()
     mod_path = mtz.mod_path
     _validate_mod_folder_path(mod_path)
     _switch_to_collection(mtz.collection_preview)
@@ -435,7 +435,7 @@ def render_icon_preview():
 
 def export_materializer():
     _validate_mtz_number()
-    mtz = HF2_Active_Mtz()
+    mtz = get_HF2_Active_Mtz()
 
     mod_path = mtz.mod_path 
     _validate_mod_folder_path(mod_path)
@@ -444,7 +444,7 @@ def export_materializer():
     _validate_textures_po2(mtz)
 
     if(mtz.maos_texture_combined == '1'):
-        _validate_if_splitted_textures_are_same_size(mtz)
+        _validate_if_split_textures_are_same_size(mtz)
 
     if(mtz.invert_mask_alpha or mtz.maos_texture_combined == '1' or mtz.normal_map_format == '1'):
         _validate_pillow_pack(mtz)

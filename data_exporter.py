@@ -1,11 +1,12 @@
 import json
 import bpy
 import os
+import random
 
 from .hf_data import Enums
 from . import utils
 from . import serializer
-from .config import Defaults
+from .consts import Defaults
 
 class MaterializerContainer():
     def __init__(self):
@@ -32,7 +33,7 @@ class MaterializerContainer():
         self.shop_category = []
         self.price = []
 
-
+        self.x_factor = 0
         #self.invert_mask_alpha = []
         
 def export_data(mtz, mtz_path):
@@ -64,17 +65,25 @@ def export_data(mtz, mtz_path):
     mtzContainer.shop_category = article_data.shop_category.strip()
     mtzContainer.price = article_data.price
 
+    if mtzContainer.affordability:
+        mtzContainer.x_factor = _ensure_x_factor(article_data)
 
-    data = serializer.Serialize(mtzContainer)
+
+    data = serializer.serialize(mtzContainer)
 
     file_name_json = os.path.join(mtz_path,"%s data.json" % (mtz.name))
-    
+
     save_JSON_file(file_name_json, data)
 
+def _ensure_x_factor(article_data):
+    if article_data.x_factor == 0:
+        article_data.x_factor = random.randint(20, 100)
+    return article_data.x_factor
+
 def save_JSON_file(file_name_json, data):
-    print(file_name_json)
-    f = open(file_name_json, "w")
-    f.write(data)
+    print(f"Saving {file_name_json}")
+    with open(file_name_json, "w") as f:
+        f.write(data)
 
 
 

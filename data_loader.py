@@ -55,7 +55,7 @@ def _load_tags_as_enum_items(filepath: str):
 
     items = []
     for i, full_path in enumerate(paths):
-        identifier = full_path  # można użyć pełnej ścieżki jako ID
+        identifier = full_path
         name = full_path.replace("/", " / ")
         description = f"Tag: {name}"
         items.append((identifier, name, description, i))

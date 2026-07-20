@@ -2,7 +2,7 @@ import bpy
 import importlib.util
 import sys
 import subprocess
-from .hf_data.HelpData import help_element
+from .hf_data.HelpData import HF2HelpElement
 
 
 def ensure_pillow_installed():
@@ -10,7 +10,6 @@ def ensure_pillow_installed():
         print("Pillow not found. Installing...")
         path = bpy.utils.user_resource("SCRIPTS", path="MODULES")
         subprocess.check_call([sys.executable, "-m", "ensurepip"])
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
         subprocess.check_call([sys.executable, "-m", "pip", "install", "Pillow", "--target", path])
         print("Pillow installed successfully")
     else:
@@ -21,7 +20,7 @@ class HF2_MTZ_OP_InstallPillow(bpy.types.Operator):
     bl_idname = "hf2mtz.instal_pillow"
     bl_label = "Install pillow package"
     bl_options = {'REGISTER'}
-    bl_description = help_element(21)
+    bl_description = HF2HelpElement.InstallPillow.value
     
     def execute(self, context):
         ensure_pillow_installed()

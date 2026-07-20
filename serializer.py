@@ -1,14 +1,11 @@
 from json import JSONEncoder
 
-import json
-
 from . import data_exporter
 
 
 
-def Serialize(o):
+def serialize(o):
     jsonString = Hf2ItemEncoder().encode(o)
-    print(jsonString)
     return jsonString
 
 class Hf2ItemEncoder(JSONEncoder):

@@ -1,13 +1,12 @@
 import os
 import numpy as np
-from .config import TextureSuffixes
+from .consts import TextureSuffixes
 
 def import_pillow():
     try:
         from PIL import Image, ImageOps
         return  Image, ImageOps
     except ImportError:
-        import bpy
         from . import module_install
         module_install.ensure_pillow_installed()
         from PIL import Image, ImageOps
@@ -16,14 +15,8 @@ def import_pillow():
 def set_alpha_to_0(path):
         Image, ImageOps = import_pillow()
         img = Image.open(path).convert("RGBA")
-        
-        r, g, b, a = img.split()
-        
-        zero_a = a.point(lambda p: 0)
-        
-        modified_img = Image.merge("RGBA", (r, g, b, zero_a))
-        
-        modified_img.save(path)
+        img.putalpha(0)
+        img.save(path)
 
 
 def _correct_bit_depth(image):

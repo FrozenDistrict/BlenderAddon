@@ -1,5 +1,4 @@
 import bpy
-from . import ui
 
 class CC_Addon_Preferences(bpy.types.AddonPreferences):
     bl_idname = __package__
@@ -19,9 +18,6 @@ classes = (
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
-
-    context = bpy.context
-    prefs = bpy.context.preferences.addons[__package__].preferences
 
 def unregister():
     for cls in reversed(classes):

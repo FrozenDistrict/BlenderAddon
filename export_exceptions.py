@@ -26,6 +26,6 @@ class PillowInstallationError(Exception):
     def __init__(self):
         super().__init__(f"Can't install Pillow package! Please install it manually using pip.")
 
-class SplittedTexturesNotSameSize(Exception):
+class SplitTexturesNotSameSize(Exception):
     def __init__(self):
-        super().__init__(f"Splitted MAOS textures are not the same size! Please make sure all assigned textures have the same dimensions.")
+        super().__init__(f"Split MAOS textures are not the same size! Please make sure all assigned textures have the same dimensions.")

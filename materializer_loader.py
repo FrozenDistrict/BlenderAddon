@@ -2,7 +2,7 @@ import os
 import bpy
 from enum import Enum
 from mathutils import Vector
-from .config import Defaults
+from .consts import Defaults
 
 def setup_albedo(t_node, master_node, n_tree, mask_map = None):
     t_node.location = Vector((-600.0, 800.0))

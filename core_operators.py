@@ -3,15 +3,15 @@ import bpy
 from .utils import *
 from .ui import categories_dialog, mtz_stids_dialog
 from .props import HF2_Selectable_Element
-from .hf_data.HelpData import help_element, HF2HelpElement as HelpElement
+from .hf_data.HelpData import HF2HelpElement
 from .data_loader import load_tags
 
 class HF2_MTZ_OP_CreateMtz(bpy.types.Operator):
     bl_idname = "hf2mtz.create_mtz"
     bl_label = "Create new Materializer"
     bl_options = {'REGISTER', 'UNDO'}
-    bl_description = help_element(12)
-    
+    bl_description = HF2HelpElement.AddMtz.value
+
 
     def execute(self, context):
         create_mtz()
@@ -33,7 +33,7 @@ class HF2_MTZ_OP_SelectCategoryDialog(bpy.types.Operator):
     bl_idname = "hf2mtz.select_mtz_category_dialog"
     bl_label = "Select materializer category dialog"
     bl_options = {'INTERNAL'}
-    bl_description = help_element(10)
+    bl_description = HF2HelpElement.MaterializerCategory.value
     
 
     def execute(self, context):
@@ -52,7 +52,7 @@ class HF2_MTZ_OP_RemoveMtz(bpy.types.Operator):
     bl_idname = "hf2mtz.remove_mtz"
     bl_label = "Remove Materializer"
     bl_options = {'REGISTER', 'UNDO'}
-    bl_description = help_element(13)
+    bl_description = HF2HelpElement.DeleteMtz.value
     
 
     def execute(self, context):
@@ -64,7 +64,7 @@ class HF2_MTZ_OP_AddUvSize(bpy.types.Operator):
     bl_idname = "hf2mtz.add_unit_size"
     bl_label = "Add uv unit size to materializer"
     bl_options = {'REGISTER', 'UNDO'}
-    bl_description = help_element(16)
+    bl_description = HF2HelpElement.AddUvsizes.value
 
 
     def execute(self, context):
@@ -75,7 +75,7 @@ class HF2_MTZ_OP_RemoveUvSize(bpy.types.Operator):
     bl_idname = "hf2mtz.remove_unit_size"
     bl_label = "Remove uv unit size to materializer"
     bl_options = {'REGISTER', 'UNDO'}
-    bl_description = help_element(17)
+    bl_description = HF2HelpElement.RemoveUvsizes.value
 
 
     def execute(self, context):
@@ -86,7 +86,7 @@ class HF2_MTZ_OP_SelectMtzStidDialog(bpy.types.Operator):
     bl_idname = "hf2mtz.select_mtz_stid_dialog"
     bl_label = "Select materializer stid dialog"
     bl_options = {'INTERNAL'}
-    bl_description = help_element(0)
+    bl_description = HF2HelpElement.MaterializerStid.value
     
 
     def execute(self, context):
@@ -117,7 +117,7 @@ class HF2_MTZ_OP_SetupPreviewCollection(bpy.types.Operator):
     bl_idname = "hf2mtz.setup_preview_collection"
     bl_label = "Setup preview collection"
     bl_options = {'REGISTER', 'UNDO'}
-    bl_description = help_element(6)
+    bl_description = HF2HelpElement.PreviewScene.value
 
     @classmethod
     def poll(cls, context):
@@ -131,7 +131,7 @@ class HF2_MTZ_OP_RenderIcon(bpy.types.Operator):
     bl_idname = "hf2mtz.render_icon"
     bl_label = "Render Materializer Icon"
     bl_options = {'REGISTER', 'UNDO'}
-    bl_description = help_element(8)
+    bl_description = HF2HelpElement.RenderIcon.value
 
     @classmethod
     def poll(cls, context):
@@ -160,7 +160,7 @@ class HF2_MTZ_OP_ExportMaterializer(bpy.types.Operator):
     bl_idname = "hf2mtz.export_materializer"
     bl_label = "Export materializer"
     bl_options = {'REGISTER', 'UNDO'}
-    bl_description = help_element(11)
+    bl_description = HF2HelpElement.ExportMaterializer.value
 
     def execute(self, context):
         try:
@@ -178,19 +178,18 @@ class HF2_MTZ_OP_Help(bpy.types.Operator):
     bl_options = {'INTERNAL'}
     bl_description = "Show help for selected element"
 
-    element : bpy.props.IntProperty(default = 0)
-    
+    element : bpy.props.StringProperty(default = "")
+
     def execute(self, context):
         return {'FINISHED'}
-    
+
     def invoke(self, context, event):
-        self.data = get_help(self.element)
         return popup_invoke(self, context)
 
     def draw(self, context):
         l = self.layout
         r = l.row()
-        r.label(text = self.data )
+        r.label(text = self.element)
     
 
 
@@ -202,9 +201,9 @@ class HF2_MTZ_OP_ArticleSelectItemKind(bpy.types.Operator):
     bl_label = "Select item kind"
     bl_options = {'INTERNAL','REGISTER', 'UNDO'}
     bl_property = "item_kind"
-    bl_description = help_element(26)
+    bl_description = HF2HelpElement.ArticleItemKind.value
 
-    item_kind : bpy.props.EnumProperty(items = load_tags("item_kind"), description = help_element(17))
+    item_kind : bpy.props.EnumProperty(items = load_tags("item_kind"), description = HF2HelpElement.ArticleItemKind.value)
     
     def invoke(self, context, event):
         context.window_manager.invoke_search_popup(self)
@@ -221,9 +220,9 @@ class HF2_MTZ_OP_ArticleSelectItemSeries(bpy.types.Operator):
     bl_label = "Select item series"
     bl_options = {'INTERNAL','REGISTER', 'UNDO'}
     bl_property = "item_series"
-    bl_description = help_element(27)
+    bl_description = HF2HelpElement.ArticleItemSeries.value
 
-    item_series : bpy.props.EnumProperty(items = load_tags("item_series"), description = help_element(18))
+    item_series : bpy.props.EnumProperty(items = load_tags("item_series"), description = HF2HelpElement.ArticleItemSeries.value)
     
     def invoke(self, context, event):
         context.window_manager.invoke_search_popup(self)
@@ -240,7 +239,7 @@ class HF2_MTZ_OP_ArticleSelectAffordability(bpy.types.Operator):
     bl_label = "Select affordability"
     bl_options = {'INTERNAL','REGISTER', 'UNDO'}
     bl_property = "affordability"
-    bl_description = help_element(28)
+    bl_description = HF2HelpElement.ArticleAffordability.value
 
     affordability : bpy.props.EnumProperty(items = load_tags("item_tag", "Money/"))
 
@@ -259,7 +258,7 @@ class HF2_MTZ_OP_ArticleSelectShopCategory(bpy.types.Operator):
     bl_label = "Select shop category"
     bl_options = {'INTERNAL','REGISTER', 'UNDO'}
     bl_property = "shop_category"
-    bl_description = help_element(29)
+    bl_description = HF2HelpElement.ArticleShopCategory.value
     
     shop_category : bpy.props.EnumProperty(items = load_tags("item_category", "Surface finishes/"))
     
