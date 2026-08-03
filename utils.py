@@ -1,5 +1,6 @@
 import bpy
 import os
+import random
 import shutil
 
 from .props import get_HF2_Mtz_list, get_HF2_Active_Mtz, get_HF2_Mtz_props
@@ -30,8 +31,16 @@ def set_mtz_shop_category(shop_category):
     mtz = get_HF2_Active_Mtz()
     mtz.article_data.shop_category = shop_category
 
+def new_x_factor():
+    used = {mtz.article_data.x_factor for mtz in get_HF2_Mtz_list()}
+    unused = [x for x in range(Defaults.XFACTORMIN, Defaults.XFACTORMAX + 1) if x not in used]
+    if not unused:
+        return random.randint(Defaults.XFACTORMIN, Defaults.XFACTORMAX)
+    return random.choice(unused)
+
 def create_mtz():
     mtz = get_HF2_Mtz_list().add()
+    mtz.article_data.x_factor = new_x_factor()
     return mtz
 
 def remove_mtz():

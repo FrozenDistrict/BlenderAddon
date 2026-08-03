@@ -22,6 +22,33 @@ pattern_usage = [
     ('2', "Walls", ""),
 ]
 
+item_kind = [
+    ("", "None", "No item kind", 0),
+    ("Wood panels", "Wood panels", "", 1),
+    ("Wallpaper", "Wallpaper", "", 2),
+    ("Paint", "Paint", "", 3),
+    ("Stone", "Stone", "", 4),
+    ("Metal panels/tiles", "Metal panels/tiles", "", 5),
+    ("Carpets", "Carpets", "", 6),
+    ("Damaged materials", "Damaged materials", "", 7),
+    ("Other", "Other", "", 8),
+]
+
+item_kind_export = {
+    "Wood panels" : "Oak panels",
+    "Wallpaper" : "Floral wallpaper",
+    "Paint" : "Black paint",
+    "Stone" : "White marble tiles",
+    "Metal panels/tiles" : "Copper tiles",
+    "Carpets" : "Poplin carpet tiles",
+    "Damaged materials" : "Damaged materials",
+    "Other" : "Other",
+}
+
+def export_item_kind(item_kind_value):
+    item_kind_value = item_kind_value.strip()
+    return item_kind_export.get(item_kind_value, item_kind_value)
+
 avaliability_export = {
     "0" : "FreelyAvailable",
     "1" : "RequireArchitect"

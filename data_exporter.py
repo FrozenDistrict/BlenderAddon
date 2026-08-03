@@ -1,7 +1,6 @@
 import json
 import bpy
 import os
-import random
 
 from .hf_data import Enums
 from . import utils
@@ -31,7 +30,7 @@ class MaterializerContainer():
         self.item_series = []
         self.affordability = []
         self.shop_category = []
-        self.price = []
+        self.override_price = []
 
         self.x_factor = 0
         #self.invert_mask_alpha = []
@@ -59,14 +58,14 @@ def export_data(mtz, mtz_path):
     #mtzContainer.invert_mask_alpha = mtz.invert_mask_alpha
 
     article_data = mtz.article_data
-    mtzContainer.item_kind = article_data.item_kind.strip()
+    mtzContainer.item_kind = _export_item_kind(article_data)
     mtzContainer.item_series = article_data.item_series.strip()
     mtzContainer.affordability = article_data.affordability.strip()
     mtzContainer.shop_category = article_data.shop_category.strip()
-    mtzContainer.price = article_data.price
+    mtzContainer.override_price = article_data.price if article_data.override_price else 0
 
     if mtzContainer.affordability:
-        mtzContainer.x_factor = _ensure_x_factor(article_data)
+        mtzContainer.x_factor = _randomize_x_factor(article_data)
 
 
     data = serializer.serialize(mtzContainer)
@@ -75,9 +74,13 @@ def export_data(mtz, mtz_path):
 
     save_JSON_file(file_name_json, data)
 
-def _ensure_x_factor(article_data):
-    if article_data.x_factor == 0:
-        article_data.x_factor = random.randint(20, 100)
+def _export_item_kind(article_data):
+    if article_data.item_kind_is_custom:
+        return article_data.item_kind.strip()
+    return Enums.export_item_kind(article_data.item_kind)
+
+def _randomize_x_factor(article_data):
+    article_data.x_factor = utils.new_x_factor()
     return article_data.x_factor
 
 def save_JSON_file(file_name_json, data):

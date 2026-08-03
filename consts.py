@@ -15,3 +15,6 @@ class Defaults:
     
     HF2PATTERNFOLDERNAME = "Patterns"
     HF2MATERIALIZERFOLDERNAME = "Materializers"
+
+    XFACTORMIN = 20
+    XFACTORMAX = 100

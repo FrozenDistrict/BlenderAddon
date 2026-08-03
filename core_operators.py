@@ -3,6 +3,7 @@ import bpy
 from .utils import *
 from .ui import categories_dialog, mtz_stids_dialog
 from .props import HF2_Selectable_Element
+from .hf_data import Enums
 from .hf_data.HelpData import HF2HelpElement
 from .data_loader import load_tags
 
@@ -203,7 +204,7 @@ class HF2_MTZ_OP_ArticleSelectItemKind(bpy.types.Operator):
     bl_property = "item_kind"
     bl_description = HF2HelpElement.ArticleItemKind.value
 
-    item_kind : bpy.props.EnumProperty(items = load_tags("item_kind"), description = HF2HelpElement.ArticleItemKind.value)
+    item_kind : bpy.props.EnumProperty(items = Enums.item_kind, description = HF2HelpElement.ArticleItemKind.value)
     
     def invoke(self, context, event):
         context.window_manager.invoke_search_popup(self)

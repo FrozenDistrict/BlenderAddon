@@ -39,6 +39,7 @@ class HF2_List(bpy.types.PropertyGroup):
 
 
 class HF2_Article_Data(bpy.types.PropertyGroup):
+    override_price : BoolProperty(default = False, description = HF2HelpElement.ArticleOverridePrice.value)
     price : IntProperty(default = 0, min = 0, description = HF2HelpElement.ArticlePrice.value)
     shop_category : StringProperty(default = "")
 

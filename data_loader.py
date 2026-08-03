@@ -51,35 +51,41 @@ def _parse_tags_file(filepath: str):
 
 
 def _load_tags_as_enum_items(filepath: str):
-    paths = _parse_tags_file(filepath)
-
     items = []
-    for i, full_path in enumerate(paths):
+    for full_path in _parse_tags_file(filepath):
         identifier = full_path
         name = full_path.replace("/", " / ")
         description = f"Tag: {name}"
-        items.append((identifier, name, description, i))
+        items.append((identifier, name, description))
 
     return items
 
 
 
-def _filter_tags_by_prefix(type, tags, prefix):  
+def _filter_tags_by_prefix(tags, prefix):
     return [tag for tag in tags if tag[0].startswith(prefix)]
 
+def _filter_tags_by_root(tags, root):
+    return [tag for tag in tags if tag[0] == root or tag[0].startswith(root + "/")]
+
 def _add_none(tags):
-    none_item = ("", "None", "No tag", len(tags))
-    return [none_item] + tags   
+    none_item = ("", "None", "No tag")
+    return [none_item] + tags
+
+def _number_items(tags):
+    return [(identifier, name, description, i) for i, (identifier, name, description) in enumerate(tags)]
 
 
-def load_tags(type, filter_prefix = None):
+def load_tags(type, filter_prefix = None, filter_root = None):
     tags = _load_tags_as_enum_items(_tags_path(type))
 
     if filter_prefix is not None:
-        tags = _filter_tags_by_prefix(type, tags, filter_prefix)
+        tags = _filter_tags_by_prefix(tags, filter_prefix)
 
-    tags = _add_none(tags)
-    return tags
+    if filter_root is not None:
+        tags = _filter_tags_by_root(tags, filter_root)
+
+    return _number_items(_add_none(tags))
 
 
 

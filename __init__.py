@@ -2,7 +2,7 @@ bl_info = {
 	"name": "HF2 Materializer Creator",
 	"description": "Tool for creating HF2 Materializer mods",
 	"author": "brushie",
-	"version": (0, 8, 4),
+	"version": (0, 8, 5),
 	"blender": (4, 0, 0),
 	"location": "3D View > Toolbox",
 	"category": "Object",

@@ -113,7 +113,11 @@ class HF2_MTZ_PT_Mtz_Article_Data(HF2_Subpanel,bpy.types.Panel):
             layout.active = False
     
         row = layout.row()
-        row.prop(article_data, "price", text = "Price")
+        row.prop(article_data, "override_price", text = "Override Price")
+
+        if article_data.override_price:
+            row = layout.row()
+            row.prop(article_data, "price", text = "Price")
 
         row = layout.row()
         row.label(text = "Item Kind:")

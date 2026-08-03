@@ -27,6 +27,7 @@ class HF2HelpElement(str, Enum):
     MAOSTextureType = "Choose whether MAOS texture is combined or splitted into seperated textures"
     UseSmoothnessInsteadOfRoughness = "Enable this if the Smoothness texture is used instead of Roughness"
     NormalMapFormat = "Choose used Normal Map Format (OpenGL or DirectX)"
+    ArticleOverridePrice = "Override the price of the item in the shop instead of letting the game calculate it"
     ArticlePrice = "Set price of the item in the shop"
     ArticleItemKind = "Set item kind for the item in the shop (e.g. \"Helmet\", \"Body\", \"Legs\" etc.)"
     ArticleItemSeries = "Set item series for the item in the shop"
