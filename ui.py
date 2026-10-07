@@ -27,6 +27,25 @@ class HF2_UI_LIST_A(bpy.types.UIList):
             layout.label(text="", icon_value=icon)
 
 
+class HF2_UI_LIST_MTZ(bpy.types.UIList):
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
+        if self.layout_type in {'DEFAULT', 'COMPACT'}:
+            layout.prop(item, "display_name", text="", emboss=False, icon_value=icon)
+        elif self.layout_type == 'GRID':
+            layout.alignment = 'CENTER'
+            layout.label(text="", icon_value=icon)
+
+    def filter_items(self, context, data, propname):
+        items = getattr(data, propname)
+        flt_flags = [self.bitflag_filter_item] * len(items)
+        if self.filter_name:
+            flt_flags = bpy.types.UI_UL_list.filter_items_by_name(self.filter_name, self.bitflag_filter_item, items, "display_name", reverse=self.use_filter_invert)
+        flt_neworder = []
+        if self.use_filter_sort_alpha:
+            flt_neworder = bpy.types.UI_UL_list.sort_items_by_name(items, "display_name")
+        return flt_flags, flt_neworder
+
+
 class HF2_UI_LIST_B(bpy.types.UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
         ob = data
@@ -55,7 +74,7 @@ class HF2_MTZ_PT_Main(bpy.types.Panel):
         obj = context.object
         scn = context.scene.hf2Mtz
 
-        layout.template_list("HF2_UI_LIST_A", "Mtz List", scn, "hf2_materializers", scn, "active_mtz_index")
+        layout.template_list("HF2_UI_LIST_MTZ", "Mtz List", scn, "hf2_materializers", scn, "active_mtz_index")
 
         row = layout.row()
         row.operator("hf2mtz.create_mtz", text = "Add Surfacer", icon = "ADD")        
@@ -255,7 +274,7 @@ class HF2_MTZ_PT_Mtz_Settings_Textures(HF2_Subpanel,bpy.types.Panel):
         row.prop(mtz,"mod_path", text = "Mod Path")
 
         row = layout.row()
-        row.prop(mtz,"name", text = "Name")
+        row.prop(mtz,"display_name", text = "Display Name")
 
         row = layout.row()
         row.label(text = "Category:")
@@ -395,6 +414,7 @@ def mtz_stids_dialog(self, context):
 
 classes = (
     HF2_UI_LIST_A,
+    HF2_UI_LIST_MTZ,
     HF2_UI_LIST_B,
 
     HF2_MTZ_PT_Main,

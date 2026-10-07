@@ -27,6 +27,5 @@ MtzTypes = [
 "Lava",
 "Glitter",
 "Sand",
-"Spice",
-"Sponge"
+"Spice"
 ]

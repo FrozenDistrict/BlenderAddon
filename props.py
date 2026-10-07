@@ -1,6 +1,8 @@
+import os
 from math import radians
 
 import bpy
+from bpy.app.handlers import persistent
 from bpy.props import (
         StringProperty,
         EnumProperty,
@@ -14,6 +16,29 @@ from bpy.props import (
 
 from .hf_data import Enums
 from .hf_data.HelpData import HF2HelpElement
+from .consts import Defaults
+
+def is_allowed_texture(image):
+    return os.path.splitext(image.filepath)[1].lower() in Defaults.ALLOWEDTEXTUREEXTENSIONS
+
+def _texture_poll(self, image):
+    return is_allowed_texture(image)
+
+def _texture_update(prop_name):
+    def update(self, context):
+        image = getattr(self, prop_name)
+        if image is None or is_allowed_texture(image):
+            return
+        setattr(self, prop_name, None)
+
+        def draw(menu, context):
+            menu.layout.label(text = "Only PNG, JPG and JPEG textures are supported.")
+        if context.window:
+            context.window_manager.popup_menu(draw, title = "Unsupported texture \"%s\"" % image.name, icon = 'ERROR')
+    return update
+
+def texture_property(prop_name):
+    return PointerProperty(type = bpy.types.Image, poll = _texture_poll, update = _texture_update(prop_name))
 
 
 def get_HF2_Mtz_props():
@@ -56,7 +81,7 @@ class HF2_Article_Data(bpy.types.PropertyGroup):
 
 
 class HF2_Materializer(bpy.types.PropertyGroup):
-    name : StringProperty(default = "Name", description = HF2HelpElement.MaterializerName.value)
+    display_name : StringProperty(default = "Display Name", description = HF2HelpElement.MaterializerName.value)
     type : EnumProperty(items = Enums.mtz_type, description = HF2HelpElement.MaterializerType.value)
     custom_colors : IntProperty(default = 0, soft_min = 0, soft_max = 4, description = HF2HelpElement.CustomColors.value)
     avaliability : EnumProperty(items = Enums.avaliability, description = HF2HelpElement.Avaliability.value)
@@ -78,29 +103,29 @@ class HF2_Materializer(bpy.types.PropertyGroup):
     support_pattern : BoolProperty(default = False, description = HF2HelpElement.SupportPattern.value)
 
 
-    main_texture : PointerProperty(type = bpy.types.Image)
-    normal_map_texture : PointerProperty(type = bpy.types.Image)
+    main_texture : texture_property("main_texture")
+    normal_map_texture : texture_property("normal_map_texture")
     normal_map_format : EnumProperty(items = [('0', "OpenGL", ""), ('1', "DirectX", "")], default = '0', description = HF2HelpElement.NormalMapFormat.value)
 
 
-    maos_texture : PointerProperty(type = bpy.types.Image)
+    maos_texture : texture_property("maos_texture")
     maos_texture_combined :  EnumProperty(items = [('0', "Combined", ""), ('1', "Split", "")], default = '0', description = HF2HelpElement.MAOSTextureType.value)
 
 
-    ao_texture : PointerProperty(type = bpy.types.Image)
-    smoothness_texture : PointerProperty(type = bpy.types.Image)
+    ao_texture : texture_property("ao_texture")
+    smoothness_texture : texture_property("smoothness_texture")
     is_smoothness : BoolProperty(default = True, description = HF2HelpElement.UseSmoothnessInsteadOfRoughness.value)
-    metallic_texture : PointerProperty(type = bpy.types.Image)
+    metallic_texture : texture_property("metallic_texture")
 
 
 
-    height_texture : PointerProperty(type = bpy.types.Image)
+    height_texture : texture_property("height_texture")
     height_blend_texture : PointerProperty(type = bpy.types.Texture)
 
-    icon_texture : PointerProperty(type = bpy.types.Image)
+    icon_texture : texture_property("icon_texture")
 
-    color_map_texture : PointerProperty(type = bpy.types.Image)
-    mask_map_texture : PointerProperty(type = bpy.types.Image)
+    color_map_texture : texture_property("color_map_texture")
+    mask_map_texture : texture_property("mask_map_texture")
     invert_mask_alpha : BoolProperty(default = False, description = HF2HelpElement.InvertAlpha.value)
 
     allowed_rotations : EnumProperty(items = Enums.allowed_rotations, description = HF2HelpElement.AllowedRotations.value)

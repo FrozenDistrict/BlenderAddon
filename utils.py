@@ -3,13 +3,13 @@ import os
 import random
 import shutil
 
-from .props import get_HF2_Mtz_list, get_HF2_Active_Mtz, get_HF2_Mtz_props
+from .props import get_HF2_Mtz_list, get_HF2_Active_Mtz, get_HF2_Mtz_props, is_allowed_texture
 from .materializer_loader import assign_materializer
 from .consts import TextureSuffixes, Defaults
 from .data_exporter import export_data
 from .export_exceptions import *
 from mathutils import Vector
-from .image_manipulation import set_alpha_to_0, combine_maos, invert_normal_map
+from .image_manipulation import set_alpha_to_0, combine_maos, invert_normal_map, save_as_rgba8_png
 
 def set_mtz_category(category):
     mtz = get_HF2_Active_Mtz()
@@ -90,6 +90,7 @@ def create_icon_render_camera():
     camera.data.ortho_scale = 1
     bpy.context.scene.render.resolution_x = 512
     bpy.context.scene.render.resolution_y = 512
+    bpy.context.scene.render.resolution_percentage = 100
 
     bpy.context.scene.camera = camera
 
@@ -143,7 +144,7 @@ def _create_sun(mtz):
     sun.data.energy = 5.0
     sun.data.color = (1.0,0.9,0.7)
     unlink_object_from_all_collections(sun)
-    sun.name = "%s Materializer Previewer Sun" % (mtz.name)
+    sun.name = "%s Materializer Previewer Sun" % (mtz.display_name)
     
     mtz.collection_preview.objects.link(sun)
     unlink_from_main_scene(sun)
@@ -166,7 +167,7 @@ def setup_height_displacement(mtz):
 
 
     if not mtz.height_blend_texture:
-        t = bpy.data.textures.new(mtz.name + " Displace Texture",'IMAGE')
+        t = bpy.data.textures.new(mtz.display_name + " Displace Texture",'IMAGE')
         mtz.height_blend_texture = t
 
     mtz.height_blend_texture.image = mtz.height_texture
@@ -204,14 +205,14 @@ def setup_preview_main():
     create_icon_render_camera()
 
     if(not mtz.collection_preview):
-       collection = bpy.data.collections.new(mtz.name)
+       collection = bpy.data.collections.new(mtz.display_name)
        mtz.collection_preview = collection
        bpy.context.scene.collection.children.link(collection)
 
     setup_lighting(mtz)
     
     if(not mtz.material_icon_preview):
-        material = bpy.data.materials.new(mtz.name)
+        material = bpy.data.materials.new(mtz.display_name)
         setup_material(mtz, True, material)
     else:
         setup_material(mtz, True)
@@ -221,9 +222,9 @@ def setup_preview_main():
         mtz.object_preview = None
         with bpy.context.temp_override(selected_objects=delete):
             bpy.ops.object.delete()
-        mtz.object_preview = create_preview_object(mtz.collection_preview, mtz.material_preview, mtz.name)
+        mtz.object_preview = create_preview_object(mtz.collection_preview, mtz.material_preview, mtz.display_name)
     else:
-        mtz.object_preview = create_preview_object(mtz.collection_preview, mtz.material_preview, mtz.name)
+        mtz.object_preview = create_preview_object(mtz.collection_preview, mtz.material_preview, mtz.display_name)
 
     if len(mtz.object_preview.data.materials):
         mtz.object_preview.data.materials[0] = mtz.material_icon_preview
@@ -254,34 +255,35 @@ def _export_textures(mtz, mtz_path):
 def _export_textures_standard(mtz, mtz_path):
     if(mtz.main_texture):
         texture_path = mtz.main_texture.filepath_from_user()
-        _copy_texture(texture_path,mtz_path,mtz.name, TextureSuffixes.BASECOLOR)
+        _copy_texture(texture_path,mtz_path, TextureSuffixes.BASECOLOR)
 
     if(mtz.normal_map_texture):
         texture_path = mtz.normal_map_texture.filepath_from_user()
-        _copy_texture(texture_path,mtz_path,mtz.name, TextureSuffixes.NORMAL)
-        if(mtz.normal_map_format == '1'):
-            invert_normal_map(_texture_path(texture_path,mtz_path,mtz.name, TextureSuffixes.NORMAL))
+        is_directx = mtz.normal_map_format == '1'
+        dst = _copy_texture(texture_path,mtz_path, TextureSuffixes.NORMAL, force_png = is_directx)
+        if(is_directx):
+            invert_normal_map(dst)
 
     if(mtz.maos_texture_combined == '0'):
         if(mtz.maos_texture):
             texture_path = mtz.maos_texture.filepath_from_user()
-            _copy_texture(texture_path,mtz_path,mtz.name, TextureSuffixes.MAOS)
+            _copy_texture(texture_path,mtz_path, TextureSuffixes.MAOS)
     else:
         combine_maos(mtz, mtz_path)
 
     if(mtz.height_texture):
         texture_path = mtz.height_texture.filepath_from_user()
-        _copy_texture(texture_path,mtz_path,mtz.name, TextureSuffixes.HEIGHT)
+        _copy_texture(texture_path,mtz_path, TextureSuffixes.HEIGHT)
     
     if(mtz.mask_map_texture):
         texture_path = mtz.mask_map_texture.filepath_from_user()
-        _copy_texture(texture_path,mtz_path,mtz.name, TextureSuffixes.STANDARDCOLORMASK)
+        dst = _copy_texture(texture_path,mtz_path, TextureSuffixes.STANDARDCOLORMASK, force_png = mtz.invert_mask_alpha)
         if(mtz.invert_mask_alpha):
-            set_alpha_to_0(_texture_path(texture_path,mtz_path,mtz.name, TextureSuffixes.STANDARDCOLORMASK))
+            set_alpha_to_0(dst)
 
     if(mtz.icon_texture):
         texture_path = mtz.icon_texture.filepath_from_user()
-        _copy_texture(texture_path,mtz_path,mtz.name, TextureSuffixes.ICON)
+        _copy_texture(texture_path,mtz_path, TextureSuffixes.ICON)
     
 
 def icon_can_be_rendered():
@@ -291,35 +293,39 @@ def icon_can_be_rendered():
 def _export_textures_pattern(mtz, mtz_path):
     if(mtz.color_map_texture):
         texture_path = mtz.color_map_texture.filepath_from_user()
-        _copy_texture(texture_path,mtz_path,mtz.name, TextureSuffixes.COLORMAP)
+        _copy_texture(texture_path,mtz_path, TextureSuffixes.COLORMAP)
 
     if(mtz.normal_map_texture):
         texture_path = mtz.normal_map_texture.filepath_from_user()
-        _copy_texture(texture_path,mtz_path,mtz.name, TextureSuffixes.NORMAL)
+        _copy_texture(texture_path,mtz_path, TextureSuffixes.NORMAL)
 
     if(mtz.mask_map_texture):
         texture_path = mtz.mask_map_texture.filepath_from_user()
-        _copy_texture(texture_path,mtz_path,mtz.name, TextureSuffixes.MASKMAP)
+        dst = _copy_texture(texture_path,mtz_path, TextureSuffixes.MASKMAP, force_png = mtz.invert_mask_alpha)
         if(mtz.invert_mask_alpha):
-            set_alpha_to_0(_texture_path(texture_path,mtz_path,mtz.name, TextureSuffixes.MASKMAP))
+            set_alpha_to_0(dst)
 
     if(mtz.icon_texture):
         texture_path = mtz.icon_texture.filepath_from_user()
-        _copy_texture(texture_path,mtz_path,mtz.name, TextureSuffixes.ICON)
+        _copy_texture(texture_path,mtz_path, TextureSuffixes.ICON)
     
 
-def _texture_path(source, target_directory, mtz_name, type):
+def _texture_path(source, target_directory, type, force_png = False):
     filename, file_extension = os.path.splitext(source)
-    filename = "%s tex %s%s" % (mtz_name, type, file_extension)
+    if force_png:
+        file_extension = ".png"
+    filename = "tex %s%s" % (type, file_extension)
     dst = os.path.join(target_directory, filename)
     return dst
 
 
-def _copy_texture(source, target_directory, mtz_name, type):
-    dst = _texture_path(source, target_directory, mtz_name, type)
-    if(source == dst):
-        return
-    shutil.copyfile(source, dst)
+def _copy_texture(source, target_directory, type, force_png = False):
+    dst = _texture_path(source, target_directory, type, force_png)
+    if(dst.lower().endswith(".png")):
+        save_as_rgba8_png(source, dst)
+    elif(source != dst):
+        shutil.copyfile(source, dst)
+    return dst
 
 
 def _validate_uv_unit_sizes(uv_unit_sizes):
@@ -349,37 +355,48 @@ def _validate_stids(mtz):
 def is_power_of_two(n):
         return (n & (n - 1)) == 0 and n != 0 
 
+def _get_exported_textures(mtz):
+    if int(mtz.type) == 1:
+        textures = [mtz.color_map_texture, mtz.normal_map_texture, mtz.mask_map_texture]
+    else:
+        textures = [mtz.main_texture, mtz.normal_map_texture, mtz.height_texture, mtz.mask_map_texture]
+        if mtz.maos_texture_combined == '0':
+            textures.append(mtz.maos_texture)
+        else:
+            textures += [mtz.metallic_texture, mtz.ao_texture, mtz.smoothness_texture]
+    textures.append(mtz.icon_texture)
+    return [tex for tex in textures if tex]
+
+def _get_texture_size(tex):
+    width, height = tex.size
+    if width == 0 or height == 0:
+        try:
+            tex.reload()
+        except RuntimeError:
+            pass
+        width, height = tex.size
+    return width, height
+
+def _validate_texture_formats(mtz):
+    unsupported_textures = [tex.name for tex in _get_exported_textures(mtz) if not is_allowed_texture(tex)]
+    if unsupported_textures:
+        raise UnsupportedTextureFormat(", ".join(unsupported_textures))
+
+def _has_png_textures(mtz):
+    return any(tex.filepath.lower().endswith(".png") for tex in _get_exported_textures(mtz))
+
 def _validate_textures_po2(mtz):
-    textures_to_check = []
-    if mtz.main_texture:
-        textures_to_check.append(mtz.main_texture)
-    if mtz.normal_map_texture:
-        textures_to_check.append(mtz.normal_map_texture)
-    if mtz.maos_texture:
-        textures_to_check.append(mtz.maos_texture)
-    if mtz.height_texture:
-        textures_to_check.append(mtz.height_texture)
-    if mtz.color_map_texture:
-        textures_to_check.append(mtz.color_map_texture)
-    if mtz.mask_map_texture:
-        textures_to_check.append(mtz.mask_map_texture)
-    if mtz.icon_texture:
-        textures_to_check.append(mtz.icon_texture)
-    if mtz.smoothness_texture:
-        textures_to_check.append(mtz.smoothness_texture)
-    if mtz.metallic_texture:
-        textures_to_check.append(mtz.metallic_texture)
-    if mtz.ao_texture:
-        textures_to_check.append(mtz.ao_texture)
-    
-
+    unreadable_textures = []
     non_po2_textures = []
-    for tex in textures_to_check:
-        width = tex.size[0]
-        height = tex.size[1]
-        if not is_power_of_two(width) or not is_power_of_two(height):
-            non_po2_textures.append(tex.name)
+    for tex in _get_exported_textures(mtz):
+        width, height = _get_texture_size(tex)
+        if width == 0 or height == 0:
+            unreadable_textures.append(tex.name)
+        elif not is_power_of_two(width) or not is_power_of_two(height):
+            non_po2_textures.append("%s (%dx%d)" % (tex.name, width, height))
 
+    if unreadable_textures:
+        raise TextureUnreadable(", ".join(unreadable_textures))
     if non_po2_textures:
         raise NoPO2(", ".join(non_po2_textures))
 
@@ -401,7 +418,7 @@ def _get_mod_folder_path(hf2_mc_path, mtz):
     if(mtz.type == '1'):
         mod_subfolder = Defaults.HF2PATTERNFOLDERNAME
 
-    return os.path.join(hf2_mc_path,mod_subfolder,mtz.name)
+    return os.path.join(hf2_mc_path,mod_subfolder,mtz.display_name)
 
 def _validate_if_split_textures_are_same_size(mtz):
     sizes = []
@@ -428,14 +445,18 @@ def render_icon_preview():
     _switch_to_collection(mtz.collection_preview)
     mod_path = _get_mod_folder_path(mod_path, mtz)
 
-    icon_name = "%s tex %s.png" % (mtz.name, TextureSuffixes.ICON)
+    icon_name = "tex %s.png" % TextureSuffixes.ICON
     icon_path = os.path.join(mod_path, icon_name)
 
     bpy.context.scene.render.filepath = icon_path
     bpy.context.scene.render.image_settings.file_format = 'PNG'
+    bpy.context.scene.render.image_settings.color_mode = 'RGBA'
+    bpy.context.scene.render.image_settings.color_depth = '8'
+    bpy.context.scene.render.resolution_percentage = 100
     bpy.ops.render.render(write_still=True)
 
-    icon = bpy.data.images.load(icon_path)
+    icon = bpy.data.images.load(icon_path, check_existing=True)
+    icon.reload()
     mtz.icon_texture = icon
 
     setup_composition()
@@ -450,12 +471,13 @@ def export_materializer():
     _validate_mod_folder_path(mod_path)
     _validate_uv_unit_sizes(mtz.uv_unit_sizes)
     _validate_stids(mtz)
+    _validate_texture_formats(mtz)
     _validate_textures_po2(mtz)
 
     if(mtz.maos_texture_combined == '1'):
         _validate_if_split_textures_are_same_size(mtz)
 
-    if(mtz.invert_mask_alpha or mtz.maos_texture_combined == '1' or mtz.normal_map_format == '1'):
+    if(mtz.invert_mask_alpha or mtz.maos_texture_combined == '1' or mtz.normal_map_format == '1' or _has_png_textures(mtz)):
         _validate_pillow_pack(mtz)
 
     mod_path = _get_mod_folder_path(mod_path, mtz)

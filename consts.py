@@ -16,5 +16,7 @@ class Defaults:
     HF2PATTERNFOLDERNAME = "Patterns"
     HF2MATERIALIZERFOLDERNAME = "Materializers"
 
+    ALLOWEDTEXTUREEXTENSIONS = (".png", ".jpg", ".jpeg")
+
     XFACTORMIN = 20
     XFACTORMAX = 100

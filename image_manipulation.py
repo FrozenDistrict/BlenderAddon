@@ -19,6 +19,17 @@ def set_alpha_to_0(path):
         img.save(path)
 
 
+def save_as_rgba8_png(source, dst):
+        Image, ImageOps = import_pillow()
+        with Image.open(source) as img:
+            img.load()
+            if img.mode.startswith("I"):
+                arr = np.clip(np.array(img).astype(np.int64), 0, 65535) >> 8
+                img = Image.fromarray(arr.astype(np.uint8), mode="L")
+            rgba = img.convert("RGBA")
+        rgba.save(dst, format="PNG")
+
+
 def _correct_bit_depth(image):
     img = image
     Image, ImageOps = import_pillow()
@@ -95,7 +106,7 @@ def combine_maos(mtz, mtz_path):
 
         rgba = Image.merge("RGBA", (metallic, ao, b_img, smoothness))
 
-        filename = "%s tex %s%s" % (mtz.name, TextureSuffixes.MAOS, ".png")
+        filename = "tex %s%s" % (TextureSuffixes.MAOS, ".png")
         output_path = os.path.join(mtz_path, filename)
         rgba.save(output_path)
 

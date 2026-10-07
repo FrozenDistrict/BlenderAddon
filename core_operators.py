@@ -223,7 +223,7 @@ class HF2_MTZ_OP_ArticleSelectItemSeries(bpy.types.Operator):
     bl_property = "item_series"
     bl_description = HF2HelpElement.ArticleItemSeries.value
 
-    item_series : bpy.props.EnumProperty(items = load_tags("item_series"), description = HF2HelpElement.ArticleItemSeries.value)
+    item_series : bpy.props.EnumProperty(items = load_tags("item_series", filter_root = "Bricks and Bushes"), description = HF2HelpElement.ArticleItemSeries.value)
     
     def invoke(self, context, event):
         context.window_manager.invoke_search_popup(self)

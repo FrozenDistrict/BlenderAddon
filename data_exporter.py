@@ -9,7 +9,7 @@ from .consts import Defaults
 
 class MaterializerContainer():
     def __init__(self):
-        self.name = []
+        self.display_name = []
         self.type = []
         self.is_grimy = []
         self.custom_colors = []
@@ -38,7 +38,7 @@ class MaterializerContainer():
 def export_data(mtz, mtz_path):
     mtzContainer = MaterializerContainer()
 
-    mtzContainer.name = mtz.name
+    mtzContainer.display_name = mtz.display_name
     mtzContainer.type = Enums.mtz_type_export[mtz.type]
 
     mtzContainer.is_grimy = mtz.is_grimy
@@ -70,7 +70,7 @@ def export_data(mtz, mtz_path):
 
     data = serializer.serialize(mtzContainer)
 
-    file_name_json = os.path.join(mtz_path,"%s data.json" % (mtz.name))
+    file_name_json = os.path.join(mtz_path, "data.json")
 
     save_JSON_file(file_name_json, data)
 

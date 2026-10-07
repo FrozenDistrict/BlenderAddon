@@ -18,6 +18,14 @@ class NoPO2(Exception):
     def __init__(self,e):
         super().__init__(f"{e} texture is not power of 2! Make sure all textures are PO2! E.g. 512x512, 1024x1024, 2048x2048 etc.")
 
+class UnsupportedTextureFormat(Exception):
+    def __init__(self,e):
+        super().__init__(f"{e} texture has unsupported format! Only PNG, JPG and JPEG textures are supported.")
+
+class TextureUnreadable(Exception):
+    def __init__(self,e):
+        super().__init__(f"{e} texture could not be read! Make sure the image file exists and is a valid image.")
+
 class PillowNotInstalled(Exception):
     def __init__(self):
         super().__init__(f"Pillow package is not installed! Please install it using button in addon preferences.")
