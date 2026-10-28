@@ -2,8 +2,8 @@ import bpy
 
 from bpy.types import Menu
 from .hf_data.HelpData import HF2HelpElement
-from .hf_data.MaterializerCategory import categories
 from .hf_data.MaterializerTypes import MtzTypes
+from .props import get_mtz_categories
 
 class HF2_Subpanel:
     bl_space_type = "VIEW_3D"
@@ -223,7 +223,7 @@ def draw_textures_standard(self, layout, mtz):
 
 
     if mtz.maos_texture_combined == '0':
-        draw_texture(layout, "MAOS: (R - Metallic, G - AO, S - Smoothness)", mtz, "maos_texture")
+        draw_texture(layout, "MAOS: (R - Metallic, G - AO, A - Smoothness)", mtz, "maos_texture")
     else:
         draw_texture(layout, "Metallic:", mtz, "metallic_texture")
         draw_texture(layout, "AO:", mtz, "ao_texture")
@@ -397,7 +397,7 @@ def categories_dialog(self, context):
     mtz = scn.hf2_materializers[scn.active_mtz_index]
     enabled_category = mtz.materializer_category
 
-    draw_categories(layout, categories, enabled_category)
+    draw_categories(layout, get_mtz_categories(mtz.type), enabled_category)
 
 
 def mtz_stids_dialog(self, context):

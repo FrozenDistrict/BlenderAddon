@@ -1,20 +1,20 @@
-Money	
-	affordable	
+Money
+	affordable
 	mid range
 	high end
-Time	Store/Filters/Filter by Style dropdown label
-	traditional	Store/Filters/Style/Traditional option
-	retro	Store/Filters/Style/Retro option
-	contemporary	Store/Filters/Style/Contemporary option
-	futuristic	Store/Filters/Style/Futuristic option
-Details	Store/Filters/Filter by Details dropdown label
-	simple	Store/Filters/Details/Minimalistic option
-	some details	Store/Filters/Details/Ordinary option
-	detailed	Store/Filters/Details/Ornate option
-Cozyness	Store/Filters/Filter by Mood dropdown label
-	austere	Store/Filters/Mood/Severe option
-	cozy	Store/Filters/Mood/Cozy option
-	semi-cozy	Store/Filters/Mood/Neutral option
+Time
+	traditional
+	retro
+	contemporary
+	futuristic
+Details
+	simple
+	some details
+	detailed
+Cozyness
+	austere
+	cozy
+	semi-cozy
 Plant
 Dev
 Flask
@@ -126,6 +126,23 @@ Socketable
 	School Chair
 	Microphone
 	Folding Fan
+	Samurai
+	Samurai Saya
+	Wakizashi Saya
+	Tanto Saya
+	Tree Lantern
+	Cups
+		B Cup 2
+		B Cup 3
+		B Cup 4
+		B Cup 5
+		B Cup 6
+		B Cup 7
+		B Cup 8
+		B Cup 9
+		B Cup 10
+		F Valenti Cup
+	Guitar 1
 SurfaceFinish
 Achievement
 	TeaCeremony

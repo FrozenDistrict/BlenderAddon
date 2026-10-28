@@ -14,7 +14,7 @@ from bpy.props import (
         FloatProperty
         )
 
-from .hf_data import Enums
+from .hf_data import Enums, MaterializerCategory, PatternCategory
 from .hf_data.HelpData import HF2HelpElement
 from .consts import Defaults
 
@@ -39,6 +39,22 @@ def _texture_update(prop_name):
 
 def texture_property(prop_name):
     return PointerProperty(type = bpy.types.Image, poll = _texture_poll, update = _texture_update(prop_name))
+
+def get_mtz_categories(mtz_type):
+    if mtz_type == '1':
+        return PatternCategory.categories
+    return MaterializerCategory.categories
+
+def category_fits_mtz_type(category, mtz_type):
+    main_cat, _, subcat = category.strip().partition("/")
+    subcats = get_mtz_categories(mtz_type).get(main_cat)
+    if subcats is None:
+        return False
+    return not subcat or subcat in subcats
+
+def _mtz_type_update(self, context):
+    if self.materializer_category and not category_fits_mtz_type(self.materializer_category, self.type):
+        self.materializer_category = ""
 
 
 def get_HF2_Mtz_props():
@@ -82,7 +98,7 @@ class HF2_Article_Data(bpy.types.PropertyGroup):
 
 class HF2_Materializer(bpy.types.PropertyGroup):
     display_name : StringProperty(default = "Display Name", description = HF2HelpElement.MaterializerName.value)
-    type : EnumProperty(items = Enums.mtz_type, description = HF2HelpElement.MaterializerType.value)
+    type : EnumProperty(items = Enums.mtz_type, description = HF2HelpElement.MaterializerType.value, update = _mtz_type_update)
     custom_colors : IntProperty(default = 0, soft_min = 0, soft_max = 4, description = HF2HelpElement.CustomColors.value)
     avaliability : EnumProperty(items = Enums.avaliability, description = HF2HelpElement.Avaliability.value)
     category :  IntProperty(default = 0)

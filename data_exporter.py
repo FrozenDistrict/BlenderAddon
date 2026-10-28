@@ -80,6 +80,7 @@ def _export_item_kind(article_data):
     return Enums.export_item_kind(article_data.item_kind)
 
 def _randomize_x_factor(article_data):
+    # Every export gets a fresh value, so re-exporting a surfacer never reuses the previous one.
     article_data.x_factor = utils.new_x_factor()
     return article_data.x_factor
 

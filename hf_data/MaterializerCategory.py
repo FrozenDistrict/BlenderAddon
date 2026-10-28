@@ -1,11 +1,17 @@
 categories = {
     "Exclusive": {},
-    "Other": {},
+    "Other": {
+        "Roofing": {},
+        "Other": {}
+    },
     "Stone": {
         "Marble": {},
         "Brick": {},
         "Stone": {},
-        "Custom color stone": {}
+        "Raw materials": {},
+        "Custom color ceramic": {},
+        "Custom color marble": {},
+        "Custom color materials": {}
     },
     "Metal": {
         "Cool metal": {},
@@ -17,13 +23,34 @@ categories = {
         "Paint": {},
         "Damaged paint": {}
     },
-    "Wallpaper": {},
+    "Wallpaper": {
+        "Stripes": {},
+        "Triangles": {},
+        "Rectangles": {},
+        "Circles and dots": {},
+        "Simple shapes": {},
+        "Flowers": {},
+        "Nature": {},
+        "Vintage": {},
+        "Abstract": {},
+        "Themed": {},
+        "Animals": {},
+        "Other": {}
+    },
     "Wood": {
         "Cool wood": {},
         "Neutral wood": {},
         "Warm wood": {},
         "Custom color wood": {}
     },
+    "Grimy": {
+        "Damaged paint": {},
+        "Damaged wood": {},
+        "Damaged materials": {},
+        "Damaged textiles": {},
+        "Damaged metal": {}
+    },
     "Plastic": {},
-    "Textiles": {}
+    "Textiles": {},
+    "Glass": {}
 }

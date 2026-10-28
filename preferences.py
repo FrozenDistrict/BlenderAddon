@@ -1,4 +1,5 @@
 import bpy
+from .module_install import get_pillow_version
 
 class CC_Addon_Preferences(bpy.types.AddonPreferences):
     bl_idname = __package__
@@ -7,7 +8,12 @@ class CC_Addon_Preferences(bpy.types.AddonPreferences):
         layout = self.layout
 
         row = layout.row()
-        row.operator("hf2mtz.instal_pillow", text = "Install Pillow", icon = "PACKAGE")
+        version = get_pillow_version()
+        if version:
+            row.label(text = "Pillow installed (%s)" % version, icon = "CHECKMARK")
+            layout.operator("hf2mtz.instal_pillow", text = "Update Pillow", icon = "FILE_REFRESH").upgrade = True
+        else:
+            row.operator("hf2mtz.instal_pillow", text = "Install Pillow", icon = "PACKAGE")
 
 
 classes = (

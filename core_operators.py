@@ -85,7 +85,7 @@ class HF2_MTZ_OP_RemoveUvSize(bpy.types.Operator):
     
 class HF2_MTZ_OP_SelectMtzStidDialog(bpy.types.Operator):
     bl_idname = "hf2mtz.select_mtz_stid_dialog"
-    bl_label = "Select materializer stid dialog"
+    bl_label = "Select materializer Tag dialog"
     bl_options = {'INTERNAL'}
     bl_description = HF2HelpElement.MaterializerStid.value
     
@@ -105,7 +105,7 @@ class HF2_MTZ_OP_SelectMtzStidDialog(bpy.types.Operator):
 
 class HF2_MTZ_OP_SetMtzStid(bpy.types.Operator):
     bl_idname = "hf2mtz.set_mtz_stid"
-    bl_label = "Set Materializer stid"
+    bl_label = "Set Materializer Tag"
     bl_options = {'INTERNAL','REGISTER', 'UNDO'}
     
     mtz_stid : bpy.props.StringProperty()

@@ -10,6 +10,10 @@ class EmptyData(Exception):
     def __init__(self,e):
         super().__init__(f"{e} is empty!")
 
+class CategoryNotMatchingType(Exception):
+    def __init__(self,e):
+        super().__init__(f"\"{e}\" category can't be used for this surfacer type! Select category again.")
+
 class NoMTZ(Exception):
     def __init__(self,e):
         super().__init__(f"There is no selected Materializer for export!")
@@ -32,7 +36,7 @@ class PillowNotInstalled(Exception):
 
 class PillowInstallationError(Exception):
     def __init__(self):
-        super().__init__(f"Can't install Pillow package! Please install it manually using pip.")
+        super().__init__(f"Can't install Pillow package! Restart Blender and try again, or install it manually using pip.")
 
 class SplitTexturesNotSameSize(Exception):
     def __init__(self):

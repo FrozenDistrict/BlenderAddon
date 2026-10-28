@@ -3,7 +3,7 @@ import os
 import random
 import shutil
 
-from .props import get_HF2_Mtz_list, get_HF2_Active_Mtz, get_HF2_Mtz_props, is_allowed_texture
+from .props import get_HF2_Mtz_list, get_HF2_Active_Mtz, get_HF2_Mtz_props, is_allowed_texture, category_fits_mtz_type
 from .materializer_loader import assign_materializer
 from .consts import TextureSuffixes, Defaults
 from .data_exporter import export_data
@@ -348,9 +348,11 @@ def _validate_mtz_number():
     
 def _validate_stids(mtz):
     if not mtz.materializer_stid:
-        raise EmptyData("Materializer stid")
+        raise EmptyData("Materializer Tag")
     if not mtz.materializer_category:
         raise EmptyData("Materializer category")
+    if not category_fits_mtz_type(mtz.materializer_category, mtz.type):
+        raise CategoryNotMatchingType(mtz.materializer_category.strip())
 
 def is_power_of_two(n):
         return (n & (n - 1)) == 0 and n != 0 
