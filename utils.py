@@ -174,21 +174,39 @@ def setup_height_displacement(mtz):
     displace.texture = mtz.height_blend_texture
 
 def setup_composition():
-    bpy.context.scene.use_nodes = True
-    tree = bpy.context.scene.node_tree
-    
-    for node in tree.nodes:
-        tree.nodes.remove(node)
+    scene = bpy.context.scene
+    uses_node_group = hasattr(scene, 'compositing_node_group')
+    if uses_node_group:
+        tree = scene.compositing_node_group
+        if tree is None:
+            tree = bpy.data.node_groups.new('HF2 Icon Compositor', 'CompositorNodeTree')
+            scene.compositing_node_group = tree
+        tree.interface.clear()
+    else:
+        scene.use_nodes = True
+        tree = scene.node_tree
+
+    tree.nodes.clear()
+    scene.render.use_compositing = True
     
     render_layers_node = tree.nodes.new(type='CompositorNodeRLayers')
     render_layers_node.location = (-300, 300)
     
     filter_node = tree.nodes.new(type='CompositorNodeFilter')
-    filter_node.filter_type = 'SHARPEN'
     filter_node.location = (0, 300)
-    filter_node.inputs[0].default_value = 0.5
-    
-    composite_node = tree.nodes.new(type='CompositorNodeComposite')
+    if 'Type' in filter_node.inputs:
+        filter_node.inputs['Type'].default_value = 'Box Sharpen'
+        filter_node.inputs['Factor'].default_value = 0.5
+    else:
+        filter_node.filter_type = 'SHARPEN'
+        filter_node.inputs['Fac'].default_value = 0.5
+
+    if uses_node_group:
+        tree.interface.new_socket(name='Image', in_out='OUTPUT', socket_type='NodeSocketColor')
+        composite_node = tree.nodes.new(type='NodeGroupOutput')
+        composite_node.is_active_output = True
+    else:
+        composite_node = tree.nodes.new(type='CompositorNodeComposite')
     composite_node.location = (300, 300)
     
     links = tree.links
@@ -455,14 +473,12 @@ def render_icon_preview():
     bpy.context.scene.render.image_settings.color_mode = 'RGBA'
     bpy.context.scene.render.image_settings.color_depth = '8'
     bpy.context.scene.render.resolution_percentage = 100
+    setup_composition()
     bpy.ops.render.render(write_still=True)
 
     icon = bpy.data.images.load(icon_path, check_existing=True)
     icon.reload()
     mtz.icon_texture = icon
-
-    setup_composition()
-
 
 
 def export_materializer():
